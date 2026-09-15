@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Каталог — Marielle</title>
+<meta name="description" content="Каталог Marielle: сукні, блузи, верхній одяг, костюми, спідниці, штани, трикотаж та аксесуари. Фільтри за розміром, кольором і ціною.">
+<meta name="theme-color" content="#FAF8F5">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+<a class="skip-link" href="#main">Перейти до вмісту</a>
+
+<svg class="hidden" aria-hidden="true" focusable="false"><defs>
+  <symbol id="spark" viewBox="0 0 100 100"><path fill="currentColor" d="M50 1 Q53.6 46.4 99 50 Q53.6 53.6 50 99 Q46.4 53.6 1 50 Q46.4 46.4 50 1 Z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.4" fill="none" stroke="currentColor" stroke-width="1.7"/><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="m16 16 4.4 4.4"/></symbol>
+  <symbol id="i-heart-o" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M12 20.4 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13Z"/></symbol>
+  <symbol id="i-arr" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M4 7h16M7 12h10M10 17h4"/></symbol>
+  <symbol id="i-tg" viewBox="0 0 24 24"><path fill="currentColor" d="M21.6 4.1 2.9 11.3c-.9.35-.9 1.62.02 1.93l4.6 1.53 1.77 5.5c.26.8 1.3.98 1.82.32l2.4-3.05 4.6 3.4c.7.5 1.7.12 1.87-.73l3.1-14.5c.2-.9-.7-1.65-1.5-1.3Zm-3.3 3.8-7.1 6.4c-.25.22-.4.53-.44.86l-.25 2.3-1.2-3.7 9-5.86Z"/></symbol>
+  <symbol id="i-ig" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" d="M7.2 3.4h9.6a3.8 3.8 0 0 1 3.8 3.8v9.6a3.8 3.8 0 0 1-3.8 3.8H7.2a3.8 3.8 0 0 1-3.8-3.8V7.2a3.8 3.8 0 0 1 3.8-3.8Z"/><circle cx="12" cy="12" r="3.9" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="17.2" cy="6.9" r="1.1" fill="currentColor"/></symbol>
+  <symbol id="i-vb" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M12 3c4.6 0 7.6 2.8 7.6 7.2 0 4.4-3 7.2-7.6 7.2-.9 0-1.7-.1-2.5-.3L5.6 20v-3.4C4 15.3 3.2 13.3 3.2 10.2 3.2 5.8 7 3 12 3Z"/><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" d="M8.4 8.2c.6 2.6 2 4 4.6 4.6"/></symbol>
+  <symbol id="i-ml" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M3.4 6.4h17.2v11.2H3.4Z"/><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="m3.4 7 8.6 6 8.6-6"/></symbol>
+</defs></svg>
+
+<header class="header">
+  <div class="wrap header__bar">
+    <a class="logo header__logo" href="index.html" aria-label="Marielle — на головну">
+      <span>Mar<span class="logo__i">ı<span class="logo__spark"><svg viewBox="0 0 100 100"><use href="#spark"/></svg></span></span>elle</span>
+    </a>
+    <nav class="nav" aria-label="Головне меню">
+      <a class="nav__link" href="catalog.html">Каталог</a>
+      <a class="nav__link" href="catalog.html?cat=dress">Сукні</a>
+      <a class="nav__link" href="catalog.html?cat=outer">Верхній одяг</a>
+      <a class="nav__link" href="catalog.html?sale=1">Sale</a>
+      <a class="nav__link" href="index.html#about">Про нас</a>
+      <a class="nav__link" href="index.html#contacts">Контакти</a>
+    </nav>
+    <div class="header__tools">
+      <button class="icon-btn" type="button" data-theme-toggle aria-label="Змінити тему"></button>
+      <a class="icon-btn" href="#search" aria-label="Пошук"><svg><use href="#i-search"/></svg></a>
+      <a class="icon-btn" href="catalog.html?fav=1" aria-label="Обране"><svg><use href="#i-heart-o"/></svg><span class="icon-btn__count" data-fav-count>0</span></a>
+      <button class="icon-btn" type="button" data-cart-open aria-label="Кошик">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 7.5h13l1 13h-15Z"/><path d="M9 10V6.8a3 3 0 0 1 6 0V10"/></svg>
+        <span class="icon-btn__count" data-cart-count>0</span>
+      </button>
+      <button class="icon-btn burger" type="button" data-menu-open aria-label="Меню" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mnav" role="dialog" aria-modal="true" aria-label="Меню">
+  <div class="wrap mnav__top">
+    <a class="logo" href="index.html"><span>Mar<span class="logo__i">ı<span class="logo__spark"><svg viewBox="0 0 100 100"><use href="#spark"/></svg></span></span>elle</span></a>
+    <button class="icon-btn" type="button" data-menu-close aria-label="Закрити меню">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="wrap mnav__body">
+    <a class="mnav__link" href="catalog.html">Каталог <span>усі товари</span></a>
+    <a class="mnav__link" href="catalog.html?cat=dress">Сукні</a>
+    <a class="mnav__link" href="catalog.html?cat=blouse">Блузи</a>
+    <a class="mnav__link" href="catalog.html?cat=outer">Верхній одяг</a>
+    <a class="mnav__link" href="catalog.html?cat=knit">Трикотаж</a>
+    <a class="mnav__link" href="catalog.html?sale=1">Sale <span>знижки</span></a>
+    <a class="mnav__link" href="index.html#about">Про нас</a>
+    <a class="mnav__link" href="index.html#contacts">Контакти</a>
+    <div class="mnav__foot">
+      <div class="mnav__tools">
+        <a class="icon-btn" href="catalog.html#search" aria-label="Пошук"><svg><use href="#i-search"/></svg></a>
+        <a class="icon-btn" href="catalog.html?fav=1" aria-label="Обране"><svg><use href="#i-heart-o"/></svg><span class="icon-btn__count" data-fav-count>0</span></a>
+        <button class="icon-btn" type="button" data-theme-toggle aria-label="Змінити тему"></button>
+      </div>
+      <a class="btn btn--block" href="tel:+380670000000">Подзвонити</a>
+      <a class="btn btn--ghost btn--block" href="https://t.me/marielle_ua" target="_blank" rel="noopener">Написати в Telegram</a>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+  <div class="wrap page-head">
+    <nav class="crumbs" aria-label="Навігаційний ланцюжок">
+      <a href="index.html">Головна</a><i>/</i><span data-crumb>Каталог</span>
+    </nav>
+    <h1 data-title>Каталог</h1>
+    <p class="lead" data-subtitle style="max-width:56ch">Усі позиції в наявності та під замовлення. Не впевнені в розмірі — напишіть нам, підкажемо.</p>
+  </div>
+
+  <div class="wrap shop">
+    <!-- ---------- ФІЛЬТРИ ---------- -->
+    <aside class="filters" aria-label="Фільтри">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <strong style="font-size:.72rem;letter-spacing:.2em;text-transform:uppercase">Фільтри</strong>
+        <button class="icon-btn filters__close hidden" type="button" data-filters-close aria-label="Закрити фільтри">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+
+      <div class="fgroup">
+        <div class="fgroup__h">Категорія</div>
+        <div data-f-cats></div>
+      </div>
+
+      <div class="fgroup">
+        <div class="fgroup__h">Розмір</div>
+        <div class="fsize" data-f-sizes></div>
+      </div>
+
+      <div class="fgroup">
+        <div class="fgroup__h">Колір</div>
+        <div class="fcol" data-f-colors></div>
+      </div>
+
+      <div class="fgroup">
+        <div class="fgroup__h">Ціна, до</div>
+        <div class="frange">
+          <input type="range" data-f-price aria-label="Максимальна ціна">
+          <span class="frange__v" data-f-price-v></span>
+        </div>
+      </div>
+
+      <div class="fgroup">
+        <div class="fgroup__h">Інше</div>
+        <label class="fopt"><input type="checkbox" data-f-instock> В наявності</label>
+        <label class="fopt"><input type="checkbox" data-f-sale> Зі знижкою</label>
+        <label class="fopt"><input type="checkbox" data-f-fav> Лише обране</label>
+      </div>
+
+      <button class="btn btn--ghost btn--block btn--sm" type="button" data-f-reset>Скинути все</button>
+    </aside>
+
+    <!-- ---------- РЕЗУЛЬТАТИ ---------- -->
+    <div>
+      <div class="shop__bar" id="search">
+        <span class="shop__count" data-count></span>
+        <button class="btn btn--ghost btn--sm fbtn" type="button" data-filters-open>
+          <svg style="width:16px;height:16px"><use href="#i-filter"/></svg> Фільтри
+        </button>
+        <div class="search">
+          <svg><use href="#i-search"/></svg>
+          <input type="search" data-q placeholder="Пошук: сукня, вовна, Margot…" aria-label="Пошук по каталогу">
+        </div>
+        <select class="sort" data-sort aria-label="Сортування">
+          <option value="pop">Спочатку популярні</option>
+          <option value="new">Спочатку новинки</option>
+          <option value="cheap">Дешевші спочатку</option>
+          <option value="rich">Дорожчі спочатку</option>
+          <option value="rate">За оцінкою</option>
+        </select>
+      </div>
+
+      <div class="chips" data-chips></div>
+      <div class="grid" data-results></div>
+    </div>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__top">
+      <div>
+        <a class="logo foot__logo" href="index.html"><span>Mar<span class="logo__i">ı<span class="logo__spark"><svg viewBox="0 0 100 100"><use href="#spark"/></svg></span></span>elle</span></a>
+        <p class="foot__about">Магазин жіночого одягу. Невеликі партії, чесні тканини та крій, перевірений на живих фігурах.</p>
+        <div class="foot__soc">
+          <a href="https://t.me/marielle_ua" target="_blank" rel="noopener" aria-label="Telegram"><svg><use href="#i-tg"/></svg></a>
+          <a href="https://instagram.com/marielle.ua" target="_blank" rel="noopener" aria-label="Instagram"><svg><use href="#i-ig"/></svg></a>
+          <a href="viber://chat?number=%2B380670000000" aria-label="Viber"><svg><use href="#i-vb"/></svg></a>
+          <a href="mailto:hello@marielle.ua" aria-label="E-mail"><svg><use href="#i-ml"/></svg></a>
+        </div>
+      </div>
+      <div>
+        <div class="foot__h">Каталог</div>
+        <div class="foot__l">
+          <a href="catalog.html?cat=dress">Сукні</a>
+          <a href="catalog.html?cat=blouse">Блузи та сорочки</a>
+          <a href="catalog.html?cat=outer">Верхній одяг</a>
+          <a href="catalog.html?cat=suit">Костюми</a>
+          <a href="catalog.html?cat=knit">Трикотаж</a>
+          <a href="catalog.html?cat=acc">Аксесуари</a>
+        </div>
+      </div>
+      <div>
+        <div class="foot__h">Покупцям</div>
+        <div class="foot__l">
+          <a href="index.html#faq">Доставка й оплата</a>
+          <a href="index.html#faq">Обмін і повернення</a>
+          <a href="index.html#faq">Таблиця розмірів</a>
+          <a href="catalog.html?sale=1">Sale</a>
+        </div>
+      </div>
+      <div>
+        <div class="foot__h">Контакти</div>
+        <div class="foot__l">
+          <a href="tel:+380670000000">+380 (67) 000-00-00</a>
+          <a href="mailto:hello@marielle.ua">hello@marielle.ua</a>
+          <span>Пн–Сб 10:00–19:00</span>
+        </div>
+      </div>
+    </div>
+    <div class="foot__bot">
+      <span>© <span data-year>2026</span> Marielle. Усі права захищено.</span>
+      <div class="foot__pay"><span>Visa</span><span>Mastercard</span><span>Apple Pay</span><span>Післяплата</span></div>
+    </div>
+  </div>
+</footer>
+
+<div class="overlay"></div>
+<aside class="drawer" role="dialog" aria-modal="true" aria-label="Кошик" aria-hidden="true">
+  <div class="drawer__top">
+    <h3>Кошик</h3>
+    <button class="icon-btn" type="button" data-cart-close aria-label="Закрити кошик">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="drawer__body" data-cart-body></div>
+  <div class="drawer__foot">
+    <div class="drawer__row"><span>Разом</span><b data-cart-total>0 ₴</b></div>
+    <div class="drawer__ship" data-cart-ship></div>
+    <button class="btn btn--block" type="button" data-cart-order disabled>Оформити замовлення</button>
+    <p class="drawer__note">Замовлення скопіюється в буфер і відкриється Telegram — залишиться натиснути «Надіслати».</p>
+  </div>
+</aside>
+
+<script src="js/data.js"></script>
+<script src="js/art.js"></script>
+<script src="js/app.js"></script>
+<script src="js/catalog.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+.claude/
+.artifact/
+*.zip
+Thumbs.db
+.DS_Store
