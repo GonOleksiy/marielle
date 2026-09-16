@@ -376,41 +376,61 @@ p:last-child { margin-bottom: 0; }
   100% { transform: translateY(100%); }
 }
 
-/* «плаваючі» товари в геройському блоці (CSS-3D, без бібліотек) */
+/* ------------------------------------------------------------
+   Вішалка в геройському блоці.
+   Речі стоять на різній глибині (translateZ), тому при русі
+   курсора розходяться з різною швидкістю — це справжня 3D-сцена,
+   а не карусель. Нічого не обертається саме по собі.
+   ------------------------------------------------------------ */
 .hero__stage {
-  position: absolute; z-index: 1; right: -2%; top: 50%;
-  width: min(54vw, 720px); aspect-ratio: 1;
+  position: absolute; z-index: 1; right: -4%; top: 50%;
+  width: min(56vw, 760px); aspect-ratio: 5 / 4;
   transform: translateY(-50%);
-  perspective: 1400px; pointer-events: none;
+  perspective: 1500px; perspective-origin: 50% 36%;
+  pointer-events: none;
 }
-.hero__float {
+.hero__rail {
   position: absolute; inset: 0;
   transform-style: preserve-3d;
-  animation: heroSpin 26s linear infinite;
+  transition: transform .9s cubic-bezier(.22,.61,.36,1);
 }
-@keyframes heroSpin { to { transform: rotateY(360deg); } }
-/* гніздо задає місце на колі… */
+/* поперечина, на якій усе висить */
+.hero__rail::before {
+  content: ''; position: absolute; left: 3%; right: 3%; top: 14%;
+  height: 1px; transform: translateZ(-30px);
+  background: linear-gradient(90deg, transparent, var(--border-2) 14%, var(--border-2) 86%, transparent);
+}
+/* --x рахується від центру сцени, тому задається через left:
+   у transform відсотки міряються від самого елемента, а не від батька */
 .hero__slot {
-  position: absolute; left: 50%; top: 50%;
-  width: 30%; aspect-ratio: 200/260; margin: -19.5% 0 0 -15%;
+  position: absolute; top: 14%;
+  left: calc(50% + var(--x, 0%));
+  width: var(--w, 25%); aspect-ratio: 200/260;
+  transform: translate3d(-50%, 0, var(--z, 0));
   transform-style: preserve-3d;
-  transform: rotateY(var(--a, 0deg)) translateZ(var(--r, 220px));
 }
-/* …а сама річ обертається назад рівно на стільки ж, тому завжди
-   повернена до глядача і ніколи не стає ребром */
+/* гачок від поперечини до плеча */
+.hero__slot::before {
+  content: ''; position: absolute; left: 50%; top: -4%; width: 1px; height: 9%;
+  background: var(--border-2);
+}
 .hero__item {
   width: 100%; height: 100%;
-  animation: billboard 26s linear infinite;
-  filter: drop-shadow(0 30px 44px rgba(23,22,26,.2));
+  animation: sway 9s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+  transform-origin: 50% 4%;
+  filter: drop-shadow(0 26px 40px rgba(23,22,26,.18));
 }
-@keyframes billboard {
-  from { transform: rotateY(calc(var(--a, 0deg) * -1)); }
-  to   { transform: rotateY(calc(var(--a, 0deg) * -1 - 360deg)); }
+/* ледь помітне погойдування, як одяг на плічках */
+@keyframes sway {
+  0%, 100% { transform: rotate(-.7deg); }
+  50%      { transform: rotate(.7deg); }
 }
 .hero__item .art { width: 100%; height: 100%; }
-[data-theme="dark"] .hero__item { filter: drop-shadow(0 30px 44px rgba(0,0,0,.7)); }
+[data-theme="dark"] .hero__item { filter: drop-shadow(0 26px 40px rgba(0,0,0,.65)); }
 @media (prefers-reduced-motion: reduce) {
-  .hero__float, .hero__item { animation: none; }
+  .hero__item { animation: none; }
+  .hero__rail { transition: none; }
 }
 
 /* ============================================================
@@ -901,6 +921,23 @@ p:last-child { margin-bottom: 0; }
 .shop { display: grid; grid-template-columns: 264px 1fr; gap: clamp(26px, 3vw, 48px); align-items: start; padding-bottom: var(--sec); }
 
 .filters { position: sticky; top: calc(var(--hdr) + 20px); display: grid; gap: 26px; }
+/* сегментований перемикач «Усі / Жінкам / Чоловікам» */
+.seg {
+  display: inline-flex; gap: 4px; padding: 4px;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px;
+}
+.seg__b {
+  flex: 1; min-height: 34px; padding: 0 14px; border-radius: 999px; white-space: nowrap;
+  font-size: .72rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-2);
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.seg__b:hover { color: var(--text); }
+.seg__b.is-on { background: var(--ink); color: #fff; }
+[data-theme="dark"] .seg__b.is-on { background: var(--accent); color: #14131A; }
+.seg--lg { padding: 5px; }
+.seg--lg .seg__b { min-height: 44px; padding: 0 26px; font-size: .78rem; }
+
 .fgroup { border-top: 1px solid var(--border); padding-top: 20px; }
 .fgroup__h { font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; color: var(--text-3); margin-bottom: 14px; }
 .fopt { display: flex; align-items: center; gap: 10px; padding: 7px 0; font-size: .92rem; cursor: pointer; transition: color var(--t-fast); }
@@ -1020,6 +1057,16 @@ p:last-child { margin-bottom: 0; }
 .specs__r { display: grid; grid-template-columns: 40% 1fr; gap: 16px; padding: 13px 0; border-bottom: 1px solid var(--border); font-size: .9rem; }
 .specs__r dt { color: var(--text-3); }
 .specs__r dd { margin: 0; }
+
+/* рядок про спосіб і термін виготовлення */
+.made {
+  display: flex; gap: 13px; align-items: flex-start;
+  padding: 16px 18px; border: 1px solid var(--accent); border-radius: var(--r-m);
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+  font-size: .88rem; color: var(--text-2);
+}
+.made__ic { flex: none; width: 17px; height: 17px; margin-top: 3px; color: var(--accent); }
+.made__ic svg { width: 100%; height: 100%; }
 
 .trust { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .trust__i { display: flex; gap: 11px; align-items: flex-start; font-size: .8rem; color: var(--text-2); }

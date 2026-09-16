@@ -17,6 +17,7 @@
 
   /* ---------- стан ---------- */
   var st = {
+    g:     '',
     cats:  [],
     sizes: [],
     colors: [],
@@ -31,6 +32,7 @@
   /* ---------- читання адреси ---------- */
   function fromURL() {
     var p = new URLSearchParams(location.search);
+    if (p.get('g') === 'w' || p.get('g') === 'm') st.g = p.get('g');
     if (p.get('cat'))   st.cats   = p.get('cat').split(',').filter(Boolean);
     if (p.get('size'))  st.sizes  = p.get('size').split(',').filter(Boolean);
     if (p.get('color')) st.colors = p.get('color').split(',').filter(Boolean);
@@ -44,6 +46,7 @@
 
   function toURL(replace) {
     var p = new URLSearchParams();
+    if (st.g) p.set('g', st.g);
     if (st.cats.length)   p.set('cat', st.cats.join(','));
     if (st.sizes.length)  p.set('size', st.sizes.join(','));
     if (st.colors.length) p.set('color', st.colors.join(','));
@@ -58,12 +61,23 @@
   }
 
   /* ---------- побудова фільтрів ---------- */
-  function buildFilters() {
-    var box = $('[data-f-cats]');
-    box.innerHTML = window.DATA.cats.map(function (c) {
-      return '<label class="fopt"><input type="checkbox" data-cat="' + c.id + '"> ' +
+  /* список категорій залежить від обраного розділу «Жінкам / Чоловікам» */
+  function buildCats() {
+    $('[data-f-cats]').innerHTML = window.DATA.catsFor(st.g).map(function (c) {
+      return '<label class="fopt"><input type="checkbox" data-cat="' + c.id + '"' +
+             (st.cats.indexOf(c.id) > -1 ? ' checked' : '') + '> ' +
              esc(c.name) + '<small>' + c.count + '</small></label>';
     }).join('');
+  }
+
+  function buildFilters() {
+    $('[data-f-genders]').innerHTML =
+      '<div class="seg" role="group" aria-label="Розділ">' +
+      [{ id: '', name: 'Усі' }].concat(window.DATA.genders).map(function (x) {
+        return '<button type="button" class="seg__b" data-gender="' + x.id + '">' + esc(x.name) + '</button>';
+      }).join('') + '</div>';
+
+    buildCats();
 
     var sizes = window.DATA.allSizes().filter(function (s) { return s.length <= 4; });
     $('[data-f-sizes]').innerHTML = sizes.map(function (s) {
@@ -82,6 +96,11 @@
 
   /* ---------- синхронізація вигляду з станом ---------- */
   function syncControls() {
+    $$('[data-gender]').forEach(function (b) {
+      var on2 = b.getAttribute('data-gender') === st.g;
+      b.classList.toggle('is-on', on2);
+      b.setAttribute('aria-pressed', on2 ? 'true' : 'false');
+    });
     $$('[data-cat]').forEach(function (i) { i.checked = st.cats.indexOf(i.getAttribute('data-cat')) > -1; });
     $$('[data-size]').forEach(function (i) { i.checked = st.sizes.indexOf(i.getAttribute('data-size')) > -1; });
     $$('[data-color]').forEach(function (i) { i.checked = st.colors.indexOf(i.getAttribute('data-color')) > -1; });
@@ -98,6 +117,8 @@
   function filtered() {
     var q = st.q.trim().toLowerCase();
     var list = window.DATA.products.filter(function (p) {
+      /* аксесуари (g === 'u') показуються в обох розділах */
+      if (st.g && p.g !== st.g && p.g !== 'u') return false;
       if (st.cats.length && st.cats.indexOf(p.cat) < 0) return false;
       if (st.sizes.length && !p.sizes.some(function (s) { return st.sizes.indexOf(s) > -1; })) return false;
       if (st.colors.length && !p.colors.some(function (c) { return st.colors.indexOf(c.name) > -1; })) return false;
@@ -133,6 +154,7 @@
   function chips() {
     var box = $('[data-chips]');
     var out = [];
+    if (st.g) out.push(chip(window.DATA.genderName(st.g), 'g', ''));
     st.cats.forEach(function (c) {
       var cat = window.DATA.cat(c);
       if (cat) out.push(chip('Категорія: ' + cat.name, 'cat', c));
@@ -160,7 +182,16 @@
     else if (st.sale) { t = 'Sale'; sub = 'Позиції зі знижкою. Кількість обмежена залишками на складі.'; }
     else if (st.cats.length === 1) {
       var c = window.DATA.cat(st.cats[0]);
-      if (c) { t = c.name; sub = c.desc + '. ' + c.count + ' ' + plural(c.count, 'позиція', 'позиції', 'позицій') + ' у розділі.'; }
+      if (c) {
+        t = c.name + (st.g && c.g === 'u' ? '' : '');
+        sub = c.desc + '. ' + c.count + ' ' + plural(c.count, 'позиція', 'позиції', 'позицій') + ' у розділі.';
+      }
+    }
+    else if (st.g) {
+      t = window.DATA.genderName(st.g);
+      sub = st.g === 'w'
+        ? 'Сукні, блузи, верхній одяг, костюми та трикотаж. Кожна модель шиється партією до 40 одиниць.'
+        : 'Сорочки, верхній одяг, костюми, штани та трикотаж. Крій із плаваючим бортом і ручною обробкою.';
     }
     $('[data-title]').textContent = t;
     $('[data-subtitle]').textContent = sub;
@@ -200,6 +231,18 @@
 
   /* ---------- події ---------- */
   function bind() {
+    on($('[data-f-genders]'), 'click', function (e) {
+      var b = e.target.closest('[data-gender]');
+      if (!b) return;
+      st.g = b.getAttribute('data-gender');
+      /* категорії іншої статі більше не діють — прибираємо їх */
+      var allowed = window.DATA.catsFor(st.g).map(function (c) { return c.id; });
+      st.cats = st.cats.filter(function (c) { return allowed.indexOf(c) > -1; });
+      buildCats();
+      syncControls();
+      render(true);
+    });
+
     on($('[data-f-cats]'), 'change', function (e) {
       var i = e.target.closest('[data-cat]');
       if (!i) return;
@@ -242,6 +285,7 @@
       var b = e.target.closest('[data-chip]');
       if (!b) return;
       var kind = b.getAttribute('data-chip'), val = b.getAttribute('data-val');
+      if (kind === 'g')     { st.g = ''; buildCats(); }
       if (kind === 'cat')   toggle(st.cats, val, false);
       if (kind === 'size')  toggle(st.sizes, val, false);
       if (kind === 'color') toggle(st.colors, val, false);
@@ -256,8 +300,9 @@
 
     on(document, 'click', function (e) {
       if (!e.target.closest('[data-f-reset]')) return;
-      st.cats = []; st.sizes = []; st.colors = [];
+      st.g = ''; st.cats = []; st.sizes = []; st.colors = [];
       st.price = RANGE[1]; st.inStock = false; st.sale = false; st.fav = false; st.q = ''; st.sort = 'pop';
+      buildCats();
       syncControls();
       render(true);
     });
@@ -275,9 +320,10 @@
 
     /* назад/вперед у браузері */
     on(window, 'popstate', function () {
-      st.cats = []; st.sizes = []; st.colors = [];
+      st.g = ''; st.cats = []; st.sizes = []; st.colors = [];
       st.price = RANGE[1]; st.inStock = false; st.sale = false; st.fav = false; st.q = ''; st.sort = 'pop';
       fromURL();
+      buildCats();
       syncControls();
       render(false);
     });
@@ -295,8 +341,8 @@
   }
 
   /* ---------- старт ---------- */
+  fromURL();       /* спершу читаємо адресу — від неї залежить список категорій */
   buildFilters();
-  fromURL();
   syncControls();
   bind();
   render(false);

@@ -712,6 +712,10 @@
       if (mode.indexOf('cat:') === 0) {
         var c = mode.slice(4);
         list = list.filter(function (p) { return p.cat === c; });
+      } else if (mode.indexOf('g:') === 0) {
+        list = window.DATA.byGender(mode.slice(2)).filter(function (p) {
+          return p.badge === 'hit' || p.badge === 'new' || p.rating >= 4.8;
+        });
       } else if (mode === 'home') {
         list = list.filter(function (p) { return p.badge === 'hit' || p.badge === 'new' || p.rating >= 4.8; });
       } else if (mode === 'sale') {
@@ -733,10 +737,12 @@
   function renderCats() {
     var box = $('[data-cats]');
     if (!box) return;
-    box.innerHTML = window.DATA.cats.map(function (c, i) {
+    var g = box.getAttribute('data-g') || '';
+    box.innerHTML = window.DATA.catsFor(g).map(function (c, i) {
       var sample = window.DATA.byCat(c.id)[0];
       var art = sample ? window.Art.render(sample, { dark: isDark() }) : '';
-      return '<a class="cat reveal" href="catalog.html?cat=' + c.id + '" style="--d:' + (i % 4) + '">' +
+      var href = 'catalog.html?' + (g ? 'g=' + g + '&' : '') + 'cat=' + c.id;
+      return '<a class="cat reveal" href="' + href + '" style="--d:' + (i % 4) + '">' +
         '<div class="cat__n">' + c.n + ' / ' + c.count + '</div>' +
         '<div class="cat__name">' + esc(c.name) + '</div>' +
         '<div class="cat__desc">' + esc(c.desc) + '</div>' +
@@ -745,6 +751,23 @@
         '</a>';
     }).join('');
     initReveal(box);
+  }
+
+  /* перемикач «Жінкам / Чоловікам» над сіткою категорій */
+  function initGenderSwitch() {
+    var sw = $('[data-gender-switch]');
+    var box = $('[data-cats]');
+    if (!sw || !box) return;
+    on(sw, 'click', function (e) {
+      var b = e.target.closest('[data-g]');
+      if (!b) return;
+      $$('[data-g]', sw).forEach(function (x) {
+        x.classList.toggle('is-on', x === b);
+        x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+      });
+      box.setAttribute('data-g', b.getAttribute('data-g'));
+      renderCats();
+    });
   }
 
   function renderLook() {
@@ -765,19 +788,57 @@
     }).join('');
   }
 
+  /* ------------------------------------------------------------
+     Вішалка в геройському блоці.
+     Кожна річ стоїть на своїй глибині; сцена повертається слідом
+     за курсором, тому далекі речі зміщуються менше за ближні.
+     ------------------------------------------------------------ */
+  var HERO_RAIL = [
+    { id: 'margot-silk',     x: '-36%', z: -230, w: '21%', d: '-1.2s' },
+    { id: 'etienne-blazer',  x: '-17%', z:  -80, w: '26%', d: '-3.4s' },
+    { id: 'colette-coat',    x:   '3%', z:   80, w: '31%', d: '0s'    },
+    { id: 'aurore-slip',     x:  '23%', z:  -60, w: '26%', d: '-2.1s' },
+    { id: 'leon-coat',       x:  '39%', z: -250, w: '21%', d: '-4.6s' }
+  ];
+
   function renderHeroFloat() {
     var box = $('[data-hero-float]');
     if (!box) return;
-    var picks = ['colette-coat', 'aurore-slip', 'margot-silk', 'céleste-sweater', 'renée-blazer', 'manon-pleated']
-      .map(function (id) { return window.DATA.byId(id); })
-      .filter(Boolean);
-    if (picks.length < 6) picks = window.DATA.products.slice(0, 6);
-    var dark = isDark(), n = picks.length, r = 230;
-    box.innerHTML = picks.map(function (p, i) {
-      var a = i * (360 / n);
-      return '<div class="hero__slot" style="--a:' + a + 'deg;--r:' + r + 'px">' +
-        '<div class="hero__item">' + window.Art.render(p, { dark: dark }) + '</div></div>';
+    var dark = isDark();
+    box.innerHTML = HERO_RAIL.map(function (s) {
+      var p = window.DATA.byId(s.id);
+      if (!p) return '';
+      return '<div class="hero__slot" style="--x:' + s.x + ';--z:' + s.z + 'px;--w:' + s.w + '">' +
+        '<div class="hero__item" style="--d:' + s.d + '">' +
+        window.Art.render(p, { dark: dark }) + '</div></div>';
     }).join('');
+  }
+
+  /* нахил сцени за курсором — без автообертання */
+  function initHeroParallax() {
+    var rail = $('[data-hero-float]');
+    if (!rail) return;
+    if (reduced()) return;
+    if (!window.matchMedia || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+    var tx = 0, ty = 0, cx = 0, cy = 0, raf = null;
+
+    function tick() {
+      cx += (tx - cx) * 0.06;
+      cy += (ty - cy) * 0.06;
+      rail.style.transform =
+        'rotateY(' + (cx * 7).toFixed(2) + 'deg) rotateX(' + (cy * -4).toFixed(2) + 'deg) ' +
+        'translateX(' + (cx * -18).toFixed(1) + 'px)';
+      if (Math.abs(tx - cx) > 0.001 || Math.abs(ty - cy) > 0.001) raf = requestAnimationFrame(tick);
+      else raf = null;
+    }
+    on(window, 'pointermove', function (e) {
+      tx = e.clientX / window.innerWidth - 0.5;
+      ty = e.clientY / window.innerHeight - 0.5;
+      if (!raf) raf = requestAnimationFrame(tick);
+    }, { passive: true });
+    /* сцена стоїть і не смикається, поки миша не рухається */
+    rail.style.transition = 'none';
   }
 
   function boot() {
@@ -789,9 +850,11 @@
     initTV();
 
     renderCats();
+    initGenderSwitch();
     renderGrids();
     renderLook();
     renderHeroFloat();
+    initHeroParallax();
     initLook();
 
     initTilt();

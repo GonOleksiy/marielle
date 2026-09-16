@@ -33,11 +33,18 @@
   /* ---------- стан вибору ---------- */
   var sel = { color: 0, size: p.sizes.length > 2 ? 1 : 0, q: 1 };
 
-  /* ---------- стандартна сітка мірок ---------- */
-  var MEAS = {
+  /* ---------- сітки мірок ---------- */
+  var MEAS_W = {
     'XS': [82, 63, 89], 'S': [86, 67, 93], 'M': [90, 71, 97],
     'L':  [96, 77, 103], 'XL': [102, 83, 109]
   };
+  var MEAS_M = {
+    'S':  [96, 82, 39], 'M': [100, 86, 40], 'L': [106, 92, 41.5],
+    'XL': [112, 98, 43], 'XXL': [118, 104, 44.5]
+  };
+  var isMen = p.g === 'm';
+  var MEAS  = isMen ? MEAS_M : MEAS_W;
+  var MEAS_H = isMen ? ['Груди, см', 'Талія, см', 'Шия, см'] : ['Груди, см', 'Талія, см', 'Стегна, см'];
 
   /* ---------- ланцюжок ---------- */
   var cat = window.DATA.cat(p.cat);
@@ -66,7 +73,7 @@
     var rows = p.sizes.filter(function (s) { return MEAS[s]; });
     if (!rows.length) return '';
     return '<div class="sizetable__wrap"><table class="sizetable">' +
-      '<thead><tr><th>Розмір</th><th>Груди, см</th><th>Талія, см</th><th>Стегна, см</th></tr></thead><tbody>' +
+      '<thead><tr><th>Розмір</th><th>' + MEAS_H[0] + '</th><th>' + MEAS_H[1] + '</th><th>' + MEAS_H[2] + '</th></tr></thead><tbody>' +
       rows.map(function (s) {
         var m = MEAS[s];
         return '<tr><td><b>' + esc(s) + '</b></td><td>' + m[0] + '</td><td>' + m[1] + '</td><td>' + m[2] + '</td></tr>';
@@ -130,6 +137,9 @@
       '</div>' +
 
       '<a class="btn btn--ghost btn--block" href="' + esc(window.DATA.shop.telegram) + '" target="_blank" rel="noopener">Запитати про розмір у Telegram</a>' +
+
+      (p.made ? '<div class="made"><span class="made__ic"><svg viewBox="0 0 100 100"><use href="#spark"/></svg></span>' +
+                '<span>' + esc(p.made) + '</span></div>' : '') +
 
       '<div class="trust">' +
         '<div class="trust__i"><svg><use href="#i-truck"/></svg><span>Безкоштовна доставка від ' + money(window.DATA.shop.freeShipFrom) + '</span></div>' +
@@ -270,8 +280,11 @@
     var wrap = $('[data-related]');
     if (!wrap) return;
     var same = window.DATA.byCat(p.cat).filter(function (x) { return x.id !== p.id; });
-    var more = window.DATA.products.filter(function (x) {
-      return x.id !== p.id && x.cat !== p.cat && (x.line === p.line || Math.abs(x.price - p.price) < 1200);
+    /* решту добираємо з того самого розділу — чоловіче не мішаємо з жіночим */
+    var pool = window.DATA.byGender(p.g === 'u' ? '' : p.g);
+    var more = pool.filter(function (x) {
+      return x.id !== p.id && x.cat !== p.cat &&
+             (x.line === p.line || Math.abs(x.price - p.price) < 4500);
     });
     var list = same.concat(more).slice(0, 4);
     if (!list.length) return;
