@@ -454,18 +454,8 @@ p:last-child { margin-bottom: 0; }
 .hero__stage--one { perspective-origin: 50% 50%; }
 .hero__stage--one .hero__slot { top: 6%; }
 
-/* ТИМЧАСОВИЙ перемикач варіантів героя — для узгодження вигляду.
-   Після вибору прибрати разом із блоком .hero__pick в index.html
-   і об'єктом HERO_SETS у js/app.js. */
-.hero__pick { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.hero__pick b { font-weight: 500; color: var(--text-3); }
-.hero__pick a {
-  padding: 4px 10px; border: 1px solid var(--border); border-radius: 999px;
-  color: var(--text-2); transition: all var(--t-fast);
-}
-.hero__pick a:hover { border-color: var(--accent); color: var(--accent); }
-.hero__pick a.is-on { background: var(--ink); border-color: var(--ink); color: #fff; }
-[data-theme="dark"] .hero__pick a.is-on { background: var(--accent); border-color: var(--accent); color: #14131A; }
+/* Варіант верху лишається перемикачем в адресі (?hero=rail|one|none),
+   але видимого контролю на сторінці немає — покупцю він ні до чого. */
 @media (prefers-reduced-motion: reduce) {
   .hero__item { animation: none; }
   .hero__rail { transition: none; }
@@ -490,6 +480,52 @@ p:last-child { margin-bottom: 0; }
   letter-spacing: .02em; color: var(--text-2); white-space: nowrap;
 }
 .marquee__i i { color: var(--accent); font-style: normal; font-size: .6em; }
+
+/* ============================================================
+   8b. ЗРАЗКИ ТКАНИН
+   Смуга під героєм замість біжучого рядка: замість руху —
+   доказ. Кожен зразок — справжнє переплетення, намальоване
+   вектором, тому масштабується без втрати якості.
+   ============================================================ */
+.fabrics { border-block: 1px solid var(--border); background: var(--bg-2); }
+.fabrics__head {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 28px; flex-wrap: wrap; margin-bottom: clamp(28px, 3.4vw, 46px);
+}
+.fabrics__head h2 { margin: .28em 0 0; font-size: clamp(1.9rem, 3.4vw, 2.9rem); }
+.fabrics__head p { margin: 10px 0 0; max-width: 46ch; color: var(--text-2); }
+
+.swatches {
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  gap: 1px; background: var(--border);
+  border: 1px solid var(--border);
+}
+.swatch {
+  position: relative; background: var(--surface);
+  padding: 20px 18px 22px;
+  display: flex; flex-direction: column; gap: 8px;
+  transition: background var(--t);
+}
+.swatch:hover { background: var(--surface-2); }
+.swatch__art {
+  aspect-ratio: 1; border-radius: var(--r-m); overflow: hidden;
+  margin-bottom: 8px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.07);
+  transition: transform var(--t-slow), box-shadow var(--t);
+}
+.swatch:hover .swatch__art {
+  transform: scale(1.04) rotate(-1deg);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.07), var(--shadow-2);
+}
+.swatch__art .weave { width: 100%; height: 100%; display: block; }
+.swatch__n { font-size: 1.08rem; line-height: 1.2; margin: 0; }
+.swatch__m {
+  font-size: .68rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--text-3);
+}
+.swatch__u {
+  margin-top: auto; padding-top: 10px; border-top: 1px solid var(--border);
+  font-size: .8rem; color: var(--text-2);
+}
 
 /* ============================================================
    9. СЕКЦІЇ
@@ -1327,3 +1363,8 @@ body.tv-mode .card__fav, body.tv-mode .card__quick { opacity: 1; transform: none
   .sec { padding-block: 18pt; }
   a[href^="http"]::after { content: ' (' attr(href) ')'; font-size: 9pt; color: #555; }
 }
+
+/* ---- зразки тканин на вужчих екранах ---- */
+@media (max-width: 1180px) { .swatches { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 720px)  { .swatches { grid-template-columns: repeat(2, 1fr); } .swatch { padding: 14px 13px 16px; } .swatch__n { font-size: .98rem; } }
+@media (max-width: 400px)  { .swatches { grid-template-columns: 1fr 1fr; } .swatch__u { display: none; } }

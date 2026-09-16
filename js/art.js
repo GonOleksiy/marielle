@@ -594,8 +594,59 @@
     return out;
   }
 
+  /* ============================================================
+     ЗРАЗКИ ТКАНИН
+     Не текстура з картинки, а справжнє переплетення, намальоване
+     як SVG-патерн: саржа йде по діагоналі, рібана — в рубчик,
+     ялинка — зигзагом. Тому зразок можна перефарбувати в будь-який
+     колір і він лишиться правдоподібним.
+     ============================================================ */
+  var WEAVES = {
+    /* саржа: діагональний рубчик, як на костюмній вовні */
+    twill: { tile: 8, d: 'M-2 2 L2 -2 M0 8 L8 0 M6 10 L10 6', w: 1.15, op: .5 },
+    /* сатин: довгі перекриття, майже гладко, блиск робить градієнт */
+    satin: { tile: 12, d: 'M0 9 L3 6 M6 9 L9 6 M3 3 L6 0 M9 3 L12 0', w: .8, op: .28 },
+    /* поплін: рівне полотняне переплетення */
+    plain: { tile: 6, d: 'M0 3 H6 M3 0 V6', w: .7, op: .34 },
+    /* рібана: вертикальний рубчик трикотажу */
+    rib:   { tile: 6, d: 'M1.5 0 V6 M4.5 0 V6', w: 1.3, op: .42 },
+    /* в\'язка: петля за петлею */
+    knit:  { tile: 10, d: 'M1 8 C1 4 4 3 5 3 C6 3 9 4 9 8 M-4 8 C-4 4 -1 3 0 3 M6 13 C7 13 10 14 10 18', w: 1.1, op: .44 },
+    /* ялинка */
+    herringbone: { tile: 12, d: 'M0 6 L3 3 L6 6 L9 3 L12 6 M0 12 L3 9 L6 12 L9 9 L12 12', w: 1.1, op: .44 },
+    /* шкіра: неправильне зерно */
+    grain: { tile: 14, d: 'M2 3 q1.4 1 0 2 M8 2 q1.6 1.2 .2 2.2 M5 8 q1.2 1 0 1.8 M11 9 q1.4 1 .2 2 M3 12 q1.3 .9 0 1.7 M9 12.5 q1.2 .9 .1 1.6', w: .9, op: .5 }
+  };
+
+  function weave(kind, hex, opts) {
+    opts = opts || {};
+    var W = WEAVES[kind] || WEAVES.plain;
+    var base = hex || '#C9AE8C';
+    var id = 'w' + (++seq);
+    var thread = lum(base) < 0.36 ? lighten(base, 0.26) : darken(base, 0.26);
+    var sheenTop = kind === 'satin' ? 0.5 : 0.26;
+
+    var out = '<svg class="weave" viewBox="0 0 120 120" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">';
+    out += '<defs>';
+    out += '<pattern id="' + id + 'p" width="' + W.tile + '" height="' + W.tile + '" patternUnits="userSpaceOnUse">' +
+           '<path d="' + W.d + '" fill="none" stroke="' + thread + '" stroke-width="' + W.w +
+           '" stroke-linecap="round" opacity="' + W.op + '"/></pattern>';
+    out += '<linearGradient id="' + id + 's" x1="0" y1="0" x2=".75" y2="1">' +
+           '<stop offset="0" stop-color="#fff" stop-opacity="' + sheenTop + '"/>' +
+           '<stop offset=".48" stop-color="#fff" stop-opacity="0"/>' +
+           '<stop offset="1" stop-color="#000" stop-opacity=".16"/></linearGradient>';
+    out += '</defs>';
+    out += '<rect width="120" height="120" fill="' + base + '"/>';
+    out += '<rect width="120" height="120" fill="url(#' + id + 'p)"/>';
+    out += '<rect width="120" height="120" fill="url(#' + id + 's)"/>';
+    out += '</svg>';
+    return out;
+  }
+
   g.Art = {
     render: render,
+    weave: weave,
+    weaves: Object.keys(WEAVES),
     types: Object.keys(S).filter(function (k) { return k !== '_'; }),
     mix: mix, lighten: lighten, darken: darken, lum: lum
   };

@@ -393,28 +393,50 @@
       on(d, 'click', function () { goTo(idx + shortest(cur, k)); });
     });
 
-    /* перетягування мишею та пальцем */
+    /* ---------- перетягування мишею та пальцем ----------
+       Колесо зупиняється там, куди його довели: кількість кроків
+       рахується з реально пройденої відстані, а не жорстким ±1.
+       Протягнули через три образи — стане на третій.            */
+    var DRAG = 0.22;                 /* градусів на піксель */
     var down = false, sx = 0, moved = 0;
+
+    /* скільки кроків «проїхало» колесо від початку перетягування */
+    function dragged() { return (moved * DRAG) / step; }
+
+    function mark(i) {
+      var live = ((Math.round(i) % n) + n) % n;
+      cells.forEach(function (c, k) { c.classList.toggle('is-front', k === live); });
+      $$('.look__dot', stage.parentNode).forEach(function (d, k) { d.classList.toggle('is-on', k === live); });
+    }
+
     on(stage, 'pointerdown', function (e) {
       down = true; sx = e.clientX; moved = 0;
       ring.classList.add('is-drag');
       stage.setPointerCapture && stage.setPointerCapture(e.pointerId);
     });
+
     on(stage, 'pointermove', function (e) {
       if (!down) return;
       moved = e.clientX - sx;
-      ring.style.transform = 'translateZ(-' + radius + 'px) rotateY(' + (angle + moved * 0.22) + 'deg)';
+      ring.style.transform = 'translateZ(-' + radius + 'px) rotateY(' + (angle + moved * DRAG) + 'deg)';
+      mark(idx - dragged());     /* підсвітка йде за колесом, а не чекає відпускання */
     });
+
     function up() {
       if (!down) return;
       down = false;
       ring.classList.remove('is-drag');
-      if (Math.abs(moved) > 42) goTo(idx + (moved < 0 ? 1 : -1));
-      else goTo(idx, true);
+      /* менше 8 px — це був клік по картці, а не перетягування */
+      goTo(Math.abs(moved) < 8 ? idx : Math.round(idx - dragged()));
     }
     on(stage, 'pointerup', up);
     on(stage, 'pointercancel', up);
     on(stage, 'pointerleave', up);
+
+    /* не відкривати товар, на якому відпустили палець після перетягування */
+    on(stage, 'click', function (e) {
+      if (Math.abs(moved) > 8) { e.preventDefault(); e.stopPropagation(); moved = 0; }
+    }, true);
 
     /* клавіатура */
     stage.setAttribute('tabindex', '0');
@@ -890,6 +912,21 @@
     });
   }
 
+  /* смуга зразків тканин замість біжучого рядка */
+  function renderFabrics() {
+    var box = $('[data-fabrics]');
+    if (!box || !window.DATA.fabrics) return;
+    box.innerHTML = window.DATA.fabrics.map(function (f, i) {
+      return '<article class="swatch reveal" style="--d:' + (i % 6) + '">' +
+        '<div class="swatch__art">' + window.Art.weave(f.weave, f.hex) + '</div>' +
+        '<h3 class="swatch__n">' + esc(f.name) + '</h3>' +
+        '<div class="swatch__m">' + esc(f.meta) + '</div>' +
+        '<div class="swatch__u">' + esc(f.use) + '</div>' +
+        '</article>';
+    }).join('');
+    initReveal(box);
+  }
+
   function renderLook() {
     var ring = $('[data-look] .look__ring');
     if (!ring) return;
@@ -955,10 +992,6 @@
         '<div class="hero__item" style="--d:' + s.d + '">' +
         window.Art.render(p, { dark: dark }) + '</div></div>';
     }).join('');
-
-    $$('[data-hv]').forEach(function (a) {
-      a.classList.toggle('is-on', a.getAttribute('data-hv') === v);
-    });
   }
 
   /* нахил сцени за курсором — без автообертання */
@@ -998,6 +1031,7 @@
 
     renderCats();
     initGenderSwitch();
+    renderFabrics();
     renderGrids();
     renderLook();
     renderHeroFloat();
