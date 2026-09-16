@@ -423,6 +423,47 @@
   }
 
   /* ============================================================
+     МОДАЛЬНІ ВІКНА: утримання фокуса
+     Поки відкрито кошик або меню, Tab має ходити всередині них,
+     а не по сторінці позаду. Після закриття фокус повертається
+     на кнопку, якою вікно відкрили.
+     ============================================================ */
+  var openModal = null, lastFocus = null;
+
+  function focusables(root) {
+    return $$('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])', root)
+      .filter(function (el) {
+        var r = el.getBoundingClientRect();
+        return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden';
+      });
+  }
+
+  function modalOpened(el) {
+    lastFocus = document.activeElement;
+    openModal = el;
+  }
+  function modalClosed(el) {
+    if (openModal !== el) return;
+    openModal = null;
+    if (lastFocus && document.contains(lastFocus)) { try { lastFocus.focus(); } catch (e) {} }
+    lastFocus = null;
+  }
+
+  on(document, 'keydown', function (e) {
+    if (e.key !== 'Tab' || !openModal) return;
+    var list = focusables(openModal);
+    if (!list.length) return;
+    var first = list[0], last = list[list.length - 1];
+    if (e.shiftKey && (document.activeElement === first || !openModal.contains(document.activeElement))) {
+      e.preventDefault(); last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault(); first.focus();
+    } else if (!openModal.contains(document.activeElement)) {
+      e.preventDefault(); first.focus();
+    }
+  });
+
+  /* ============================================================
      ХЕДЕР, МЕНЮ, ШУХЛЯДА
      ============================================================ */
   function initChrome() {
@@ -449,12 +490,17 @@
     function closeMenu() {
       if (!mnav) return;
       mnav.classList.remove('is-open');
+      mnav.setAttribute('aria-hidden', 'true');
       document.body.classList.remove('is-locked');
       var b = $('[data-menu-open]'); if (b) b.setAttribute('aria-expanded', 'false');
+      modalClosed(mnav);
     }
+    if (mnav) mnav.setAttribute('aria-hidden', 'true');
     on($('[data-menu-open]'), 'click', function () {
       if (!mnav) return;
+      modalOpened(mnav);
       mnav.classList.add('is-open');
+      mnav.setAttribute('aria-hidden', 'false');
       document.body.classList.add('is-locked');
       this.setAttribute('aria-expanded', 'true');
       var f = $('.mnav__link', mnav);
@@ -468,6 +514,7 @@
     function openCart() {
       if (!drawer) return;
       Cart.paint();
+      modalOpened(drawer);
       drawer.classList.add('is-open');
       if (overlay) overlay.classList.add('is-on');
       document.body.classList.add('is-locked');
@@ -481,6 +528,7 @@
       if (overlay) overlay.classList.remove('is-on');
       document.body.classList.remove('is-locked');
       drawer.setAttribute('aria-hidden', 'true');
+      modalClosed(drawer);
     }
     window.__openCart = openCart;
     $$('[data-cart-open]').forEach(function (b) { on(b, 'click', openCart); });
