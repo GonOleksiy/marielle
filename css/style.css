@@ -18,7 +18,9 @@
   --ivory:      #FAF8F5;
   --paper:      #FFFFFF;
   --line:       #E6E0D8;
-  --muted:      #8A847C;
+  /* дрібний розріджений текст (надзаголовки, підписи) мусить лишатись
+     читабельним — світліший відтінок давав контраст нижче 4.5:1 */
+  --muted:      #6B655C;
 
   /* семантика (світла тема) */
   --bg:         var(--ivory);
@@ -1148,8 +1150,13 @@ p:last-child { margin-bottom: 0; }
   .header__bar { grid-template-columns: auto 1fr; }
   .header__logo { font-size: 1.42rem; }
   .header__tools { gap: 0; }
-  .header__tools .icon-btn { width: 38px; height: 38px; }
-  .header__tools .icon-btn svg { width: 18px; height: 18px; }
+  /* палець вимагає щонайменше 44 px — менше робити не можна */
+  .header__tools .icon-btn { width: 44px; height: 44px; }
+  .header__tools .icon-btn svg { width: 19px; height: 19px; }
+  .seg__b { min-height: 42px; }
+  .fopt { padding: 11px 0; }
+  .crumbs { gap: 10px 9px; }
+  .crumbs a { padding: 5px 0; }
   .mnav__tools { display: flex; gap: 8px; justify-content: center; margin-bottom: 18px; }
   .mnav__tools .icon-btn { border-color: var(--border); width: 48px; height: 48px; }
   .grid, .grid--3 { grid-template-columns: repeat(2, 1fr); gap: 12px; }
