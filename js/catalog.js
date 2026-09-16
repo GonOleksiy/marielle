@@ -217,7 +217,10 @@
   /* ---------- рендер ---------- */
   function render(push) {
     var list = filtered();
-    $('[data-count]').textContent = list.length + ' ' + plural(list.length, 'товар', 'товари', 'товарів');
+    var found = list.length + ' ' + plural(list.length, 'товар', 'товари', 'товарів');
+    $('[data-count]').textContent = found;
+    var apply = $('[data-filters-apply]');
+    if (apply) apply.textContent = list.length ? 'Показати ' + found : 'Нічого не знайдено';
     chips();
     heading();
 
@@ -316,13 +319,29 @@
 
     /* фільтри як панель на планшеті й телефоні */
     var panel = $('.filters'), overlay = $('.overlay');
-    on($('[data-filters-open]'), 'click', function () {
+    function openFilters() {
+      M.modalOpened(panel);
       panel.classList.add('is-open');
       if (overlay) overlay.classList.add('is-on');
-    });
-    on($('[data-filters-close]'), 'click', function () {
+      document.body.classList.add('is-locked');
+      var f = $('[data-filters-close]', panel);
+      if (f) setTimeout(function () { f.focus(); }, 60);
+    }
+    function closeFilters() {
       panel.classList.remove('is-open');
       if (overlay) overlay.classList.remove('is-on');
+      document.body.classList.remove('is-locked');
+      M.modalClosed(panel);
+    }
+    on($('[data-filters-open]'), 'click', openFilters);
+    on($('[data-filters-close]'), 'click', closeFilters);
+    on($('[data-filters-apply]'), 'click', closeFilters);
+    on(overlay, 'click', closeFilters);
+    on(document, 'keydown', function (e) { if (e.key === 'Escape') closeFilters(); });
+    /* після вибору на телефоні панель має закритись сама */
+    on(panel, 'click', function (e) {
+      if (!panel.classList.contains('is-open')) return;
+      if (e.target.closest('[data-f-reset]')) setTimeout(closeFilters, 120);
     });
 
     /* назад/вперед у браузері */

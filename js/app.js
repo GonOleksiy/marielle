@@ -959,6 +959,7 @@
   window.MR = {
     $: $, $$: $$, on: on, money: money, esc: esc, qs: qs, I: I,
     isDark: isDark, reduced: reduced, toast: toast,
+    modalOpened: modalOpened, modalClosed: modalClosed,
     Cart: Cart, Fav: Fav, Theme: Theme,
     cardHTML: cardHTML, initTilt: initTilt, initReveal: initReveal
   };

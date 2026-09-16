@@ -1102,7 +1102,38 @@ p:last-child { margin-bottom: 0; }
 .sizetable__wrap { overflow-x: auto; }
 
 /* ============================================================
-   23. АДАПТИВ
+   23. БЕЗПЕЧНІ ЗОНИ (виріз, «чубчик», смуга жестів)
+   У нас viewport-fit=cover, тому вміст може заповзти під виріз
+   камери згори і під смугу жестів знизу. Вирівнюємо все, що
+   притиснуте до країв екрана.
+   ============================================================ */
+@supports (padding: env(safe-area-inset-top)) {
+  html { scroll-padding-top: calc(var(--hdr) + 16px + env(safe-area-inset-top)); }
+
+  .wrap {
+    padding-left:  max(var(--gut), env(safe-area-inset-left));
+    padding-right: max(var(--gut), env(safe-area-inset-right));
+  }
+
+  .header      { padding-top: env(safe-area-inset-top); }
+  .hero        { padding-top: calc(var(--hdr) + env(safe-area-inset-top)); }
+  .page-head   { padding-top: calc(var(--hdr) + env(safe-area-inset-top) + clamp(40px, 6vw, 88px)); }
+  .mnav__top   { margin-top: env(safe-area-inset-top); }
+  .mnav__body  { padding-bottom: calc(48px + env(safe-area-inset-bottom)); }
+
+  .drawer__top  { padding-top: calc(22px + env(safe-area-inset-top)); }
+  .drawer__foot { padding-bottom: calc(22px + env(safe-area-inset-bottom)); }
+  .drawer       { padding-right: env(safe-area-inset-right); }
+
+  .filters { padding-top: calc(24px + env(safe-area-inset-top)); padding-left: max(24px, env(safe-area-inset-left)); }
+
+  .toast     { bottom: calc(16px + env(safe-area-inset-bottom)); }
+  .foot__bot { padding-bottom: calc(26px + env(safe-area-inset-bottom)); }
+  .skip-link:focus { top: calc(16px + env(safe-area-inset-top)); }
+}
+
+/* ============================================================
+   24. АДАПТИВ
    ============================================================ */
 
 /* великі ноутбуки */
@@ -1142,6 +1173,13 @@ p:last-child { margin-bottom: 0; }
   }
   .filters.is-open { transform: none; }
   .filters__close { display: inline-grid !important; }
+  /* «Показати» липне до низу панелі, щоб вийти з фільтрів
+     можна було одним рухом великого пальця */
+  .filters__apply {
+    display: flex !important;
+    position: sticky; bottom: 0; z-index: 2; margin-top: 4px;
+  }
+  .filters::after { content: ''; display: block; height: env(safe-area-inset-bottom, 0px); }
 }
 
 /* телефон */
@@ -1199,7 +1237,7 @@ p:last-child { margin-bottom: 0; }
 }
 
 /* ============================================================
-   24. ТЕЛЕВІЗОР — велика дистанція перегляду
+   25. ТЕЛЕВІЗОР — велика дистанція перегляду
    ============================================================ */
 @media (min-width: 1700px) {
   :root { --wrap: 1560px; }
@@ -1232,7 +1270,7 @@ body.tv-mode .card__fav, body.tv-mode .card__quick { opacity: 1; transform: none
 }
 
 /* ============================================================
-   25. ДРУК
+   26. ДРУК
    ============================================================ */
 @media print {
   .header, .mnav, .drawer, .overlay, .toast, .hero__canvas, .hero__stage,
