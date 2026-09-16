@@ -44,8 +44,16 @@
     if (p.get('sort')) st.sort = p.get('sort');
   }
 
+  /* параметри, якими керує саме каталог; решту (tv, hero, utm-мітки
+     з реклами) переносимо як є, інакше вони зникали при першому ж
+     перемальовуванні списку */
+  var OWNED = ['g', 'cat', 'size', 'color', 'price', 'stock', 'sale', 'fav', 'q', 'sort'];
+
   function toURL(replace) {
     var p = new URLSearchParams();
+    new URLSearchParams(location.search).forEach(function (v, k) {
+      if (OWNED.indexOf(k) < 0) p.set(k, v);
+    });
     if (st.g) p.set('g', st.g);
     if (st.cats.length)   p.set('cat', st.cats.join(','));
     if (st.sizes.length)  p.set('size', st.sizes.join(','));

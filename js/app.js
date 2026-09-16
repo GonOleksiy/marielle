@@ -706,16 +706,31 @@
      ============================================================ */
   function initTV() {
     var ua = navigator.userAgent;
-    var isTV = /SmartTV|SMART-TV|Tizen|Web0S|WebOS|NetCast|HbbTV|BRAVIA|AFT[A-Z]|GoogleTV|CrKey|VIDAA|PhilipsTV/i.test(ua) ||
-               (window.innerWidth >= 1900 && window.matchMedia && !window.matchMedia('(hover: hover)').matches);
+    var forced = null;
+    var p = qs('tv');
+    if (p === '1' || p === '0') { forced = p === '1'; try { localStorage.setItem('mrl.tv', p); } catch (e) {} }
+    else { try { var s = localStorage.getItem('mrl.tv'); if (s === '1' || s === '0') forced = s === '1'; } catch (e) {} }
+
+    var isTV = forced !== null ? forced : (
+      /SmartTV|SMART-TV|Tizen|Web0S|WebOS|NetCast|HbbTV|BRAVIA|AFT[A-Z]|GoogleTV|CrKey|VIDAA|PhilipsTV|SonyCEBrowser|Roku/i.test(ua) ||
+      (window.innerWidth >= 1900 && window.matchMedia && !window.matchMedia('(hover: hover)').matches)
+    );
     if (!isTV) return;
     document.body.classList.add('tv-mode');
 
     on(document, 'keydown', function (e) {
       var k = e.key;
       if (k !== 'ArrowUp' && k !== 'ArrowDown' && k !== 'ArrowLeft' && k !== 'ArrowRight') return;
-      var tag = (document.activeElement && document.activeElement.tagName) || '';
-      if (/INPUT|TEXTAREA|SELECT/.test(tag)) return;
+
+      /* У полі вводу стрілки потрібні самому полю — але не всі,
+         інакше пультом у пошук можна зайти й ніколи з нього не вийти.
+         Текст: ліво-право рухають курсор, верх-низ виводять геть.
+         Список: верх-низ міняють значення, ліво-право виводять геть. */
+      var el = document.activeElement;
+      var tag = (el && el.tagName) || '';
+      if (/INPUT|TEXTAREA/.test(tag) && (k === 'ArrowLeft' || k === 'ArrowRight')) return;
+      if (tag === 'TEXTAREA' && (k === 'ArrowUp' || k === 'ArrowDown')) return;
+      if (tag === 'SELECT' && (k === 'ArrowUp' || k === 'ArrowDown')) return;
 
       var items = $$('a[href], button:not([disabled]), input, select, [tabindex]:not([tabindex="-1"])')
         .filter(function (el) {

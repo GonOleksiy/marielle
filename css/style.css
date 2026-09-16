@@ -97,6 +97,8 @@ html {
 }
 
 body {
+  /* сірий прямокутник під пальцем на Android виглядає неохайно */
+  -webkit-tap-highlight-color: transparent;
   margin: 0;
   background: var(--bg);
   color: var(--text);
@@ -832,6 +834,12 @@ p:last-child { margin-bottom: 0; }
   background: var(--bg); border: 1px solid var(--border); border-radius: var(--r-m);
   font-size: .84rem; font-family: var(--ff-ui); resize: vertical;
 }
+/* Safari на iPhone сам наближає сторінку, коли фокус потрапляє в поле
+   з текстом дрібнішим за 16 px. Тому на дотикових екранах — рівно 16. */
+@media (hover: none) {
+  .form__ok textarea, .field input, .field textarea, .field select,
+  .search input, .sort, .news__form input { font-size: 16px; }
+}
 .form__send { display: flex; gap: 10px; flex-wrap: wrap; }
 
 /* ============================================================
@@ -1031,6 +1039,10 @@ p:last-child { margin-bottom: 0; }
   border: 1px solid var(--border);
   display: grid; place-items: center; perspective: 1200px;
   cursor: grab;
+  /* пальцем: по вертикалі сторінка гортається, по горизонталі
+     річ обертається — без цього браузер з'їдав би обидва жести */
+  touch-action: pan-y;
+  -webkit-user-select: none; user-select: none;
 }
 .pdp__stage:active { cursor: grabbing; }
 .pdp__stage .art { width: 74%; transition: transform var(--t); transform-style: preserve-3d; }
@@ -1182,6 +1194,14 @@ p:last-child { margin-bottom: 0; }
   .filters::after { content: ''; display: block; height: env(safe-area-inset-bottom, 0px); }
 }
 
+/* планшет у книжковій орієнтації: три колонки тут уже тиснуть,
+   дві дають картці нормальний розмір */
+@media (max-width: 900px) {
+  .grid, .grid--3 { grid-template-columns: repeat(2, 1fr); }
+  .look__stage { height: clamp(360px, 58vw, 520px); }
+  .about__art { max-width: 380px; }
+}
+
 /* телефон */
 @media (max-width: 720px) {
   :root { --gut: 18px; --r-l: 14px; --r-xl: 20px; }
@@ -1253,7 +1273,10 @@ body.tv-mode .btn { min-height: 62px; padding: 0 38px; }
 body.tv-mode .card__title { font-size: 1.6rem; }
 body.tv-mode .icon-btn { width: 54px; height: 54px; }
 body.tv-mode .icon-btn svg { width: 24px; height: 24px; }
-/* на ТВ фокус має бути помітним з дивана */
+/* На ТВ фокус має бути помітним з дивана. Тут навмисно :focus,
+   а не тільки :focus-visible — миші на телевізорі немає, тому
+   зайвих рамок від кліків не буде, а загубити фокус не можна. */
+body.tv-mode :focus,
 body.tv-mode :focus-visible {
   outline: 4px solid var(--accent); outline-offset: 5px;
   box-shadow: 0 0 0 10px color-mix(in srgb, var(--accent) 22%, transparent);
