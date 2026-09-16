@@ -130,17 +130,24 @@ button { cursor: pointer; background: none; border: 0; padding: 0; }
 /* ============================================================
    3. ТИПОГРАФІКА
    ============================================================ */
+/* Трекінг мусить стискатися разом із кеглем: на 96 px ті самі
+   −0.012 em, що й на 20 px, лишають літери розсипаними. Чим
+   більший серіф — тим тісніше він має бути набраний. */
 h1, h2, h3, h4 {
   font-family: var(--ff-display);
   font-weight: 400;
   line-height: 1.08;
-  letter-spacing: -.012em;
   margin: 0 0 .4em;
 }
-h1 { font-size: clamp(3.1rem, 8.4vw, 7.4rem); }
-h2 { font-size: clamp(2.3rem, 5vw, 4.1rem); }
-h3 { font-size: clamp(1.4rem, 2.2vw, 1.95rem); }
-h4 { font-size: clamp(1.15rem, 1.5vw, 1.35rem); }
+h1 { font-size: clamp(3.1rem, 8.4vw, 7.4rem); letter-spacing: -.028em; line-height: 1.02; }
+h2 { font-size: clamp(2.3rem, 5vw, 4.1rem);   letter-spacing: -.021em; line-height: 1.06; }
+h3 { font-size: clamp(1.4rem, 2.2vw, 1.95rem); letter-spacing: -.014em; }
+h4 { font-size: clamp(1.15rem, 1.5vw, 1.35rem); letter-spacing: -.008em; }
+/* на вузькому екрані кегль падає — трекінг має відпустити назад */
+@media (max-width: 720px) {
+  h1 { letter-spacing: -.022em; }
+  h2 { letter-spacing: -.016em; }
+}
 p  { margin: 0 0 1em; }
 p:last-child { margin-bottom: 0; }
 
@@ -336,9 +343,12 @@ p:last-child { margin-bottom: 0; }
 /* ============================================================
    7. ГЕРОЙ
    ============================================================ */
+/* Колонка, а не центрування: службовий рядок стоїть у потоці
+   під вмістом і фізично не може на нього наїхати навіть на
+   низькому екрані. Раніше він був absolute і перекривав кнопки. */
 .hero {
   position: relative; min-height: 100svh;
-  display: flex; align-items: center;
+  display: flex; flex-direction: column;
   padding-top: var(--hdr); overflow: hidden;
   background: var(--bg);
 }
@@ -353,7 +363,11 @@ p:last-child { margin-bottom: 0; }
     radial-gradient(120% 90% at 78% 40%, transparent 30%, var(--bg) 82%),
     linear-gradient(to right, var(--bg) 4%, color-mix(in srgb, var(--bg) 62%, transparent) 40%, transparent 62%);
 }
-.hero__inner { position: relative; z-index: 2; padding-block: clamp(60px, 9vh, 120px); }
+.hero__inner {
+  position: relative; z-index: 2;
+  flex: 1 1 auto; display: flex; align-items: center;
+  padding-block: clamp(48px, 7vh, 110px);
+}
 .hero__content { max-width: min(680px, 54vw); }
 .hero h1 { margin: .22em 0 .3em; text-wrap: balance; }
 .hero h1 em { font-style: italic; color: var(--accent); }
@@ -361,7 +375,7 @@ p:last-child { margin-bottom: 0; }
 .hero__cta { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
 
 .hero__meta {
-  position: absolute; left: var(--gut); right: var(--gut); bottom: 26px; z-index: 2;
+  position: relative; z-index: 2; flex: 0 0 auto; margin-bottom: 26px;
   display: flex; align-items: center; justify-content: space-between; gap: 16px 24px;
   flex-wrap: wrap;
   padding-top: 20px; border-top: 1px solid var(--border);
@@ -635,7 +649,8 @@ p:last-child { margin-bottom: 0; }
 }
 .look__ring {
   position: absolute; inset: 0; transform-style: preserve-3d;
-  transition: transform .82s cubic-bezier(.22,.61,.36,1);
+  transition: transform .6s cubic-bezier(.3,.7,.3,1);
+  will-change: transform;
 }
 .look__ring.is-drag { transition: none; }
 .look__cell {
@@ -646,10 +661,13 @@ p:last-child { margin-bottom: 0; }
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-l);
   overflow: hidden; backface-visibility: hidden;
   box-shadow: var(--shadow-1);
-  transition: box-shadow var(--t), border-color var(--t), filter var(--t);
-  filter: brightness(.9) saturate(.85);
+  /* filter анімувати дорого — на кожному кадрі обертання браузер
+     перемальовував би всі вісім карток. Гасимо opacity, вона
+     рахується на відеокарті. */
+  transition: box-shadow var(--t), border-color var(--t), opacity var(--t);
+  opacity: .58;
 }
-.look__cell.is-front { filter: none; box-shadow: var(--shadow-3); border-color: var(--accent); }
+.look__cell.is-front { opacity: 1; box-shadow: var(--shadow-3); border-color: var(--accent); }
 .look__art { position: absolute; inset: 3% 10% 21%; display: grid; place-items: center; }
 .look__art .art { width: 100%; height: 100%; }
 .look__cap {
@@ -1169,9 +1187,9 @@ p:last-child { margin-bottom: 0; }
   .nav { display: none; }
   .burger { display: inline-grid; }
   .hero { display: flex; flex-direction: column; align-items: stretch; min-height: auto; padding-block: calc(var(--hdr) + 40px) 90px; }
-  .hero__inner { order: 1; }
+  .hero__inner { order: 1; flex: none; display: block; padding-block: 0; }
   .hero__stage { order: 2; position: relative; right: auto; top: auto; transform: none; width: 100%; max-width: 520px; margin: 30px auto 0; }
-  .hero__meta  { order: 3; position: static; margin-top: 44px; }
+  .hero__meta  { order: 3; position: static; margin: 44px 0 0; }
   .hero__content { max-width: none; }
   .hero__veil { background: linear-gradient(to bottom, transparent, var(--bg) 88%); }
   .about { grid-template-columns: 1fr; }

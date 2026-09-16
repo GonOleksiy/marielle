@@ -342,34 +342,55 @@
 
     var step = 360 / n;
     var radius = Math.round((stage.clientWidth * 0.28) / Math.tan(Math.PI / n)) || 420;
-    var angle = 0, cur = 0;
+
+    /* idx безперервний і може виходити за межі 0…n-1.
+       Саме тому колесо після останнього образу робить ще один крок
+       уперед, а не відкручується назад через усі — кут ніколи не
+       «стрибає» з −315° на 0°. cur — це лише idx, згорнутий у межі
+       списку, і потрібен тільки для підсвітки крапок. */
+    var idx = 0, cur = 0, angle = 0;
 
     function layout() {
       radius = Math.round((cells[0].offsetWidth * 0.62) / Math.tan(Math.PI / n));
       cells.forEach(function (c, i) {
         c.style.transform = 'rotateY(' + (i * step) + 'deg) translateZ(' + radius + 'px)';
       });
-      turn(cur, true);
+      goTo(idx, true);
     }
-    function turn(i, silent) {
-      cur = ((i % n) + n) % n;
-      angle = -cur * step;
+
+    function goTo(target, silent) {
+      idx = target;
+      cur = ((idx % n) + n) % n;
+      angle = -idx * step;
       ring.style.transform = 'translateZ(-' + radius + 'px) rotateY(' + angle + 'deg)';
-      cells.forEach(function (c, k) { c.classList.toggle('is-front', k === cur); });
-      $$('.look__dot', stage.parentNode).forEach(function (d, k) { d.classList.toggle('is-on', k === cur); });
-      if (!silent) {
-        cells.forEach(function (c, k) { c.setAttribute('aria-hidden', k === cur ? 'false' : 'true'); });
-      }
+      cells.forEach(function (c, k) {
+        c.classList.toggle('is-front', k === cur);
+        c.setAttribute('aria-hidden', k === cur ? 'false' : 'true');
+        c.setAttribute('tabindex', k === cur ? '0' : '-1');
+      });
+      $$('.look__dot', stage.parentNode).forEach(function (d, k) {
+        d.classList.toggle('is-on', k === cur);
+        d.setAttribute('aria-current', k === cur ? 'true' : 'false');
+      });
+    }
+
+    /* найкоротший шлях від поточної позиції до потрібної крапки:
+       з восьмої на другу вигідніше крутити вперед, а не назад */
+    function shortest(from, to) {
+      var d = (to - from) % n;
+      if (d >  n / 2) d -= n;
+      if (d < -n / 2) d += n;
+      return d;
     }
 
     layout();
     on(window, 'resize', layout);
 
     var prev = $('[data-look-prev]'), next = $('[data-look-next]');
-    on(prev, 'click', function () { turn(cur - 1); });
-    on(next, 'click', function () { turn(cur + 1); });
+    on(prev, 'click', function () { goTo(idx - 1); });
+    on(next, 'click', function () { goTo(idx + 1); });
     $$('.look__dot', stage.parentNode).forEach(function (d, k) {
-      on(d, 'click', function () { turn(k); });
+      on(d, 'click', function () { goTo(idx + shortest(cur, k)); });
     });
 
     /* перетягування мишею та пальцем */
@@ -388,8 +409,8 @@
       if (!down) return;
       down = false;
       ring.classList.remove('is-drag');
-      if (Math.abs(moved) > 42) turn(cur + (moved < 0 ? 1 : -1));
-      else turn(cur, true);
+      if (Math.abs(moved) > 42) goTo(idx + (moved < 0 ? 1 : -1));
+      else goTo(idx, true);
     }
     on(stage, 'pointerup', up);
     on(stage, 'pointercancel', up);
@@ -398,13 +419,13 @@
     /* клавіатура */
     stage.setAttribute('tabindex', '0');
     on(stage, 'keydown', function (e) {
-      if (e.key === 'ArrowLeft') { e.preventDefault(); turn(cur - 1); }
-      if (e.key === 'ArrowRight') { e.preventDefault(); turn(cur + 1); }
+      if (e.key === 'ArrowLeft')  { e.preventDefault(); goTo(idx - 1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); goTo(idx + 1); }
     });
 
     /* автообертання, поки видно і поки не чіпають */
     var timer = null;
-    function play() { if (!reduced() && !timer) timer = setInterval(function () { turn(cur + 1); }, 4200); }
+    function play() { if (!reduced() && !timer) timer = setInterval(function () { goTo(idx + 1); }, 4600); }
     function stop() { clearInterval(timer); timer = null; }
     on(stage, 'pointerenter', stop);
     on(stage, 'pointerleave', play);
