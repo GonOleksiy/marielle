@@ -880,7 +880,14 @@
     var box = $('[data-cats]');
     if (!box) return;
     var g = box.getAttribute('data-g') || '';
-    box.innerHTML = window.DATA.catsFor(g).map(function (c, i) {
+    var list = window.DATA.catsFor(g);
+
+    /* стільки колонок, щоб останній ряд не лишався напівпорожнім */
+    var cols = 4;
+    [4, 3, 2].some(function (n) { if (list.length % n === 0) { cols = n; return true; } });
+    box.style.setProperty('--cols', cols);
+
+    box.innerHTML = list.map(function (c, i) {
       var sample = window.DATA.byCat(c.id)[0];
       var art = sample ? window.Art.render(sample, { dark: isDark() }) : '';
       var href = 'catalog.html?' + (g ? 'g=' + g + '&' : '') + 'cat=' + c.id;
