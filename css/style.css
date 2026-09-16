@@ -910,6 +910,13 @@ p:last-child { margin-bottom: 0; }
 .drawer__row b { font-family: var(--ff-display); font-size: 1.6rem; font-weight: 400; }
 .drawer__ship { font-size: .8rem; color: var(--accent); }
 .drawer__note { font-size: .74rem; color: var(--text-3); text-align: center; }
+.drawer__sent {
+  display: grid; gap: 12px; padding: 16px;
+  border: 1px solid var(--accent); border-radius: var(--r-m);
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+  animation: pop .4s cubic-bezier(.2,.9,.3,1.2);
+}
+.drawer__sent p { font-size: .86rem; color: var(--text-2); }
 .drawer__empty { padding: 72px 16px; text-align: center; color: var(--text-3); display: grid; gap: 18px; justify-items: center; }
 .drawer__empty svg { width: 46px; height: 46px; opacity: .45; }
 

@@ -558,10 +558,35 @@
       if (d) { Cart.remove(d.getAttribute('data-del')); toast('Прибрано з кошика'); }
     });
 
-    /* оформлення: бекенду немає — готуємо текст і віддаємо в месенджер */
+    /* ---------- оформлення ----------
+       Бекенду немає, тому замовлення треба донести до продавця
+       руками покупця. На телефоні це робить системне вікно
+       «Поділитися»: текст уже всередині, лишається обрати
+       Telegram чи Viber — один дотик замість «скопіюй, знайди
+       чат, встав». На комп'ютері такого вікна немає, тому
+       копіюємо в буфер і відкриваємо Telegram.                */
+    function sentState() {
+      var box = $('[data-cart-sent]');
+      if (box) box.hidden = false;
+    }
+
+    /* підказка під кнопкою має описувати те, що станеться насправді */
+    var hint = $('[data-cart-hint]');
+    if (hint && !navigator.share) {
+      hint.textContent = 'Замовлення скопіюється в буфер і відкриється Telegram — залишиться вставити й натиснути «Надіслати».';
+    }
+
     on($('[data-cart-order]'), 'click', function () {
       if (!Cart.items.length) return;
       var txt = Cart.orderText();
+
+      if (navigator.share) {
+        navigator.share({ title: 'Замовлення Marielle', text: txt })
+          .then(sentState)
+          .catch(function () { /* покупець передумав ділитись — нічого не робимо */ });
+        return;
+      }
+
       if (navigator.clipboard) navigator.clipboard.writeText(txt).catch(function () {});
       toast('Замовлення скопійовано — надішліть його нам');
       if (SHOP.telegram) window.open(SHOP.telegram, '_blank', 'noopener');
@@ -570,6 +595,15 @@
           '?subject=' + encodeURIComponent('Замовлення з сайту Marielle') +
           '&body=' + encodeURIComponent(txt);
       }
+      sentState();
+    });
+
+    on($('[data-cart-clear]'), 'click', function () {
+      Cart.items = [];
+      Cart.save();
+      var box = $('[data-cart-sent]');
+      if (box) box.hidden = true;
+      toast('Кошик очищено');
     });
 
     /* глобальні кліки: у кошик / в обране */

@@ -168,7 +168,11 @@
     <div class="drawer__row"><span>Разом</span><b data-cart-total>0 ₴</b></div>
     <div class="drawer__ship" data-cart-ship></div>
     <button class="btn btn--block" type="button" data-cart-order disabled>Оформити замовлення</button>
-    <p class="drawer__note">Замовлення скопіюється в буфер і відкриється Telegram — залишиться натиснути «Надіслати».</p>
+    <p class="drawer__note" data-cart-hint>Замовлення відкриється у вікні «Поділитися» — оберіть Telegram або Viber, текст уже буде всередині.</p>
+    <div class="drawer__sent" data-cart-sent hidden>
+      <p>Замовлення підготовлено. Ми відповімо протягом робочого дня.</p>
+      <button class="btn btn--ghost btn--sm btn--block" type="button" data-cart-clear>Очистити кошик</button>
+    </div>
   </div>
 </aside>
 
