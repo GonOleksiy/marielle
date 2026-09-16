@@ -92,6 +92,13 @@
 
     var range = $('[data-f-price]');
     range.min = RANGE[0]; range.max = RANGE[1]; range.step = 100;
+
+    /* сортування за оцінкою ховаємо, поки оцінки не справжні */
+    if (!window.DATA.showRatings) {
+      var opt = $('[data-sort] option[value="rate"]');
+      if (opt) opt.remove();
+      if (st.sort === 'rate') st.sort = 'pop';
+    }
   }
 
   /* ---------- синхронізація вигляду з станом ---------- */

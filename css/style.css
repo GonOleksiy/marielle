@@ -732,8 +732,9 @@ p:last-child { margin-bottom: 0; }
 }
 .rev:hover { transform: translateY(-5px); box-shadow: var(--shadow-2); }
 .rev__stars { display: flex; gap: 3px; color: var(--accent); }
-.rev__stars svg { width: 15px; height: 15px; fill: currentColor; }
-.rev__t { font-family: var(--ff-display); font-size: 1.2rem; line-height: 1.45; }
+.rev__stars svg { width: 20px; height: 20px; fill: currentColor; }
+.rev__h { font-size: 1.4rem; margin: 0; }
+.rev__t { font-size: .94rem; line-height: 1.7; color: var(--text-2); margin: 0; }
 .rev__a { margin-top: auto; display: flex; align-items: center; gap: 12px; }
 .rev__av {
   width: 40px; height: 40px; border-radius: 999px; display: grid; place-items: center;

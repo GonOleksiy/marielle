@@ -264,8 +264,10 @@
         '<div class="card__line">' + esc(p.line) + ' · ' + esc(p.catName) + '</div>' +
         '<h3 class="card__title"><a href="' + p.url + '">' + esc(p.name) + '</a></h3>' +
         '<div class="card__spec">' + spec + '</div>' +
-        '<div class="card__rate">' + I.star + '<span>' + p.rating.toFixed(1) + '</span>' +
-          '<span style="opacity:.6">(' + p.reviews + ')</span></div>' +
+        (window.DATA.showRatings
+          ? '<div class="card__rate">' + I.star + '<span>' + p.rating.toFixed(1) + '</span>' +
+            '<span style="opacity:.6">(' + p.reviews + ')</span></div>'
+          : '') +
         '<div class="card__foot">' +
           '<div class="price">' + (p.old ? '<span class="price__old">' + money(p.old) + '</span>' : '') +
             '<span class="price__now' + (p.old ? ' is-sale' : '') + '">' + money(p.price) + '</span></div>' +
@@ -864,7 +866,7 @@
   function heroVariant() {
     var v = qs('hero');
     if (!HERO_SETS[v]) { try { v = localStorage.getItem('mrl.hero'); } catch (e) { v = null; } }
-    if (!HERO_SETS[v]) v = 'rail';
+    if (!HERO_SETS[v]) v = 'none';
     try { localStorage.setItem('mrl.hero', v); } catch (e) {}
     return v;
   }

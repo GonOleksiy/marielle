@@ -97,10 +97,12 @@
         '<h1>' + esc(p.name) + '</h1>' +
       '</div>' +
 
-      '<div class="pdp__rate">' +
-        '<span class="stars">' + stars(p.rating) + '</span>' +
-        '<span>' + p.rating.toFixed(1) + ' · ' + p.reviews + ' відгуків</span>' +
-      '</div>' +
+      (window.DATA.showRatings
+        ? '<div class="pdp__rate">' +
+            '<span class="stars">' + stars(p.rating) + '</span>' +
+            '<span>' + p.rating.toFixed(1) + ' · ' + p.reviews + ' відгуків</span>' +
+          '</div>'
+        : '') +
 
       '<div class="pdp__price">' +
         (p.old ? '<span class="price__old">' + money(p.old) + '</span>' : '') +
@@ -301,7 +303,7 @@
   (function () {
     var s = document.createElement('script');
     s.type = 'application/ld+json';
-    s.textContent = JSON.stringify({
+    var ld = {
       '@context': 'https://schema.org',
       '@type': 'Product',
       name: p.name,
@@ -310,14 +312,18 @@
       category: p.catName,
       color: p.colors.map(function (c) { return c.name; }).join(', '),
       size: p.sizes.join(', '),
-      aggregateRating: { '@type': 'AggregateRating', ratingValue: p.rating, reviewCount: p.reviews },
       offers: {
         '@type': 'Offer',
         price: p.price,
         priceCurrency: 'UAH',
         availability: p.inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'
       }
-    });
+    };
+    /* рейтинг у розмітці для пошуковиків — лише коли він справжній */
+    if (window.DATA.showRatings) {
+      ld.aggregateRating = { '@type': 'AggregateRating', ratingValue: p.rating, reviewCount: p.reviews };
+    }
+    s.textContent = JSON.stringify(ld);
     document.head.appendChild(s);
   })();
 })();

@@ -377,6 +377,12 @@
     genders: GENDERS,
     products: P,
     shop: SHOP,
+
+    /* Оцінки й кількість відгуків у товарах нижче — вигадані.
+       Поки немає справжніх, вони не показуються на сайті:
+       фальшивий рейтинг — це конкретна неправдива заява покупцю.
+       Коли зберете реальні відгуки — поставте true. */
+    showRatings: false,
     byId: function (id) {
       for (var i = 0; i < P.length; i++) if (P[i].id === id) return P[i];
       return null;
