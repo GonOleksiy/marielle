@@ -793,25 +793,52 @@
      Кожна річ стоїть на своїй глибині; сцена повертається слідом
      за курсором, тому далекі речі зміщуються менше за ближні.
      ------------------------------------------------------------ */
-  var HERO_RAIL = [
-    { id: 'margot-silk',     x: '-36%', z: -230, w: '21%', d: '-1.2s' },
-    { id: 'etienne-blazer',  x: '-17%', z:  -80, w: '26%', d: '-3.4s' },
-    { id: 'colette-coat',    x:   '3%', z:   80, w: '31%', d: '0s'    },
-    { id: 'aurore-slip',     x:  '23%', z:  -60, w: '26%', d: '-2.1s' },
-    { id: 'leon-coat',       x:  '39%', z: -250, w: '21%', d: '-4.6s' }
-  ];
+  /* Варіанти героя — перемикаються адресою ?hero=rail|one|none
+     і запам'ятовуються, щоб можна було спокійно погортати сайт
+     у кожному з них і порівняти. */
+  var HERO_SETS = {
+    /* вішалка: п'ять речей на різній глибині */
+    rail: [
+      { id: 'margot-silk',    x: '-36%', z: -230, w: '21%', d: '-1.2s' },
+      { id: 'etienne-blazer', x: '-17%', z:  -80, w: '26%', d: '-3.4s' },
+      { id: 'colette-coat',   x:   '3%', z:   80, w: '31%', d: '0s'    },
+      { id: 'aurore-slip',    x:  '23%', z:  -60, w: '26%', d: '-2.1s' },
+      { id: 'leon-coat',      x:  '39%', z: -250, w: '21%', d: '-4.6s' }
+    ],
+    /* одна річ крупно */
+    one: [
+      { id: 'colette-coat',   x:   '0%', z:    0, w: '52%', d: '0s'    }
+    ],
+    /* нічого, крім «шовкового» тла */
+    none: []
+  };
+
+  function heroVariant() {
+    var v = qs('hero');
+    if (!HERO_SETS[v]) { try { v = localStorage.getItem('mrl.hero'); } catch (e) { v = null; } }
+    if (!HERO_SETS[v]) v = 'rail';
+    try { localStorage.setItem('mrl.hero', v); } catch (e) {}
+    return v;
+  }
 
   function renderHeroFloat() {
     var box = $('[data-hero-float]');
     if (!box) return;
+    var v = heroVariant();
+    var stage = box.closest('.hero__stage');
+    if (stage) stage.className = 'hero__stage hero__stage--' + v;
     var dark = isDark();
-    box.innerHTML = HERO_RAIL.map(function (s) {
+    box.innerHTML = HERO_SETS[v].map(function (s) {
       var p = window.DATA.byId(s.id);
       if (!p) return '';
       return '<div class="hero__slot" style="--x:' + s.x + ';--z:' + s.z + 'px;--w:' + s.w + '">' +
         '<div class="hero__item" style="--d:' + s.d + '">' +
         window.Art.render(p, { dark: dark }) + '</div></div>';
     }).join('');
+
+    $$('[data-hv]').forEach(function (a) {
+      a.classList.toggle('is-on', a.getAttribute('data-hv') === v);
+    });
   }
 
   /* нахил сцени за курсором — без автообертання */

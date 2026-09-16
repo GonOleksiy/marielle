@@ -358,7 +358,8 @@ p:last-child { margin-bottom: 0; }
 
 .hero__meta {
   position: absolute; left: var(--gut); right: var(--gut); bottom: 26px; z-index: 2;
-  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px 24px;
+  flex-wrap: wrap;
   padding-top: 20px; border-top: 1px solid var(--border);
   font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--text-3);
 }
@@ -428,6 +429,25 @@ p:last-child { margin-bottom: 0; }
 }
 .hero__item .art { width: 100%; height: 100%; }
 [data-theme="dark"] .hero__item { filter: drop-shadow(0 26px 40px rgba(0,0,0,.65)); }
+/* поперечина й гачки потрібні лише варіанту «вішалка» */
+.hero__stage--one .hero__rail::before,
+.hero__stage--none .hero__rail::before,
+.hero__stage--one .hero__slot::before { display: none; }
+.hero__stage--one { perspective-origin: 50% 50%; }
+.hero__stage--one .hero__slot { top: 6%; }
+
+/* ТИМЧАСОВИЙ перемикач варіантів героя — для узгодження вигляду.
+   Після вибору прибрати разом із блоком .hero__pick в index.html
+   і об'єктом HERO_SETS у js/app.js. */
+.hero__pick { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.hero__pick b { font-weight: 500; color: var(--text-3); }
+.hero__pick a {
+  padding: 4px 10px; border: 1px solid var(--border); border-radius: 999px;
+  color: var(--text-2); transition: all var(--t-fast);
+}
+.hero__pick a:hover { border-color: var(--accent); color: var(--accent); }
+.hero__pick a.is-on { background: var(--ink); border-color: var(--ink); color: #fff; }
+[data-theme="dark"] .hero__pick a.is-on { background: var(--accent); border-color: var(--accent); color: #14131A; }
 @media (prefers-reduced-motion: reduce) {
   .hero__item { animation: none; }
   .hero__rail { transition: none; }
